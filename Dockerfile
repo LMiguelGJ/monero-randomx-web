@@ -16,7 +16,7 @@ WORKDIR /src
 # para builds reproducibles (DL3008).
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
-        make=4.3-4.1 \
+        make \
  && rm -rf /var/lib/apt/lists/*
 
 # Copiamos solo lo necesario para compilar el motor. .dockerignore evita que
