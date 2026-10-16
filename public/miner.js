@@ -61,6 +61,11 @@ let datasetInitThreads = Math.max(1, Math.min(32,
   Number(params.get('init_threads')) || 32));
 
 const $ = (id) => document.getElementById(id);
+const translateUI = (text) => window.RandomXI18n ? window.RandomXI18n.t(text) : text;
+function renderTranslatedText(element, source) {
+  element.dataset.i18n = source;
+  element.textContent = translateUI(source);
+}
 
 function hexToBytes(hex) {
   const bytes = new Uint8Array(hex.length / 2);
@@ -97,16 +102,16 @@ function targetToDiff(targetHex) {
 }
 
 function updateUI() {
-  $('hashrateBar').innerHTML = renderHashrateBar(state.hashrate, state.hashrateMax)
-    + ' ' + state.hashrate.toFixed(0).padStart(4, ' ') + ' H/s';
-  $('hashrateMeta').textContent = state.hashrateMax > 0
+  setBarContent($('hashrateBar'), renderHashrateBar(state.hashrate, state.hashrateMax)
+    + ' ' + state.hashrate.toFixed(0).padStart(4, ' ') + ' H/s');
+  $('hashrateMeta').textContent = translateUI(state.hashrateMax > 0
     ? `max ${state.hashrateMax.toFixed(0)} H/s · session`
-    : 'no samples yet';
+    : 'no samples yet');
   $('accepted').textContent = state.accepted;
   $('rejected').textContent = state.rejected;
-  $('mode').textContent = state.mode;
-  $('status').textContent = state.status;
-  $('toggle').textContent = state.mining ? 'Stop' : 'Start';
+  $('mode').textContent = translateUI(state.mode);
+  $('status').textContent = translateUI(state.status);
+  $('toggle').textContent = translateUI(state.mining ? 'Stop' : 'Start');
   // Don't blow away .pulse — toggle only the .active modifier.
   $('toggle').classList.toggle('active', state.mining);
   updateMini();
@@ -126,12 +131,27 @@ function updateMini() {
   $('miniEta').textContent = etaText.padStart(5, ' ');
   $('miniShares').textContent = state.accepted + '/' + state.rejected;
   $('miniHashrate').textContent = state.hashrate.toFixed(0).padStart(4, ' ');
-  $('miniToggle').textContent = state.mining ? 'Stop' : 'Start';
+  $('miniToggle').textContent = translateUI(state.mining ? 'Stop' : 'Start');
   $('miniToggle').classList.toggle('active', state.mining);
 }
 
 // htop-style hashrate bar: 40 cells, filled to round(current/max * 40), with
 // the rightmost filled cell wrapped in .blink-cell so it pulses.
+function setBarContent(element, markup) {
+  element.replaceChildren();
+  const token = '<span class="blink-cell">▰</span>';
+  const parts = String(markup).split(token);
+  parts.forEach((part, index) => {
+    if (part) element.appendChild(document.createTextNode(part));
+    if (index < parts.length - 1) {
+      const pulse = document.createElement('span');
+      pulse.className = 'blink-cell';
+      pulse.textContent = '▰';
+      element.appendChild(pulse);
+    }
+  });
+}
+
 function renderHashrateBar(current, max) {
   if (!max || max <= 0 || !current || current <= 0) return '▱'.repeat(40);
   const ratio = Math.min(1, current / max);
@@ -165,18 +185,18 @@ function tickBars() {
     const elapsed = (performance.now() - state.shareEtaStart) / 1000;
     const eta = state.shareEtaTotal;
     const pct = (elapsed / eta) * 100;
-    $('shareBar').innerHTML = renderBar(pct, { blinkOnOverflow: true });
+    setBarContent($('shareBar'), renderBar(pct, { blinkOnOverflow: true }));
     if (pct > 100) {
-      $('shareBarMeta').textContent =
-        `${Math.floor(elapsed)}s elapsed · ~${Math.ceil(eta)}s mean · ${Math.ceil(elapsed - eta)}s over`;
+      $('shareBarMeta').textContent = translateUI(
+        `${Math.floor(elapsed)}s elapsed · ~${Math.ceil(eta)}s mean · ${Math.ceil(elapsed - eta)}s over`);
     } else {
-      $('shareBarMeta').textContent =
-        `${Math.floor(elapsed)}s elapsed · ~${Math.ceil(eta)}s mean · ${Math.ceil(eta - elapsed)}s to go`;
+      $('shareBarMeta').textContent = translateUI(
+        `${Math.floor(elapsed)}s elapsed · ~${Math.ceil(eta)}s mean · ${Math.ceil(eta - elapsed)}s to go`);
     }
   } else {
     // Static idle render — bar at 0%, meta says why. No animation.
-    $('shareBar').innerHTML = renderBar(0);
-    $('shareBarMeta').textContent = state.mining ? 'awaiting hashrate' : 'not mining';
+    setBarContent($('shareBar'), renderBar(0));
+    $('shareBarMeta').textContent = translateUI(state.mining ? 'awaiting hashrate' : 'not mining');
   }
 }
 
@@ -187,7 +207,9 @@ function log(msg) {
   // entries, leave their position alone.
   const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 4;
   const line = document.createElement('div');
-  line.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+  line.dataset.i18nLogSource = String(msg);
+  line.dataset.i18nLogTime = `[${new Date().toLocaleTimeString()}]`;
+  line.textContent = `${line.dataset.i18nLogTime} ${translateUI(msg)}`;
   el.appendChild(line);
   if (atBottom) el.scrollTop = el.scrollHeight;
 }
@@ -234,7 +256,16 @@ function connectWS() {
   };
 
   state.ws.onmessage = (e) => {
-    const msg = JSON.parse(e.data);
+    let msg;
+    try { msg = JSON.parse(e.data); }
+    catch (parseError) {
+      log('Error: ' + (parseError && parseError.message ? parseError.message : 'malformed pool frame'));
+      state.status = 'error';
+      updateUI();
+      if (state.ws && state.ws.readyState === WebSocket.OPEN) state.ws.close();
+      scheduleReconnect('Pool connection error');
+      return;
+    }
 
     if (msg.error) {
       if (msg.id === 2) {
@@ -291,7 +322,7 @@ function connectWS() {
     scheduleReconnect('Disconnected');
   };
 
-  state.ws.onerror = (e) => {
+  state.ws.onerror = () => {
     log('WebSocket error');
   };
 }
@@ -350,7 +381,7 @@ class NoSabPool {
         full: [...Array(this.full).keys()],
         send: (i, m, transfer) => this.workers[i].postMessage(m, transfer || []),
         progress: (done, total, etaSec) => this._emit({ type: 'dataset_progress', done, total, etaSec, threads: n }),
-        done: (seed, replicas) => this._emit({
+        done: (_seed, replicas) => this._emit({
           type: 'status', message: `fb_full: ${replicas.length}/${this.full} replica(s) mining in full mode`,
         }),
       });
@@ -433,7 +464,7 @@ class NoSabPool {
 
   terminate() {
     for (const w of this.workers) {
-      try { w.terminate(); } catch (_) {}
+      try { w.terminate(); } catch {}
     }
     this.workers = [];
   }
@@ -610,10 +641,9 @@ function initWorker() {
         const pct = msg.total > 0 ? (msg.done / msg.total) * 100 : 0;
         $('datasetBarRow').hidden = false;
         $('datasetBar').textContent = renderBar(pct);
-        $('datasetBarMeta').textContent =
-          msg.done >= msg.total
-            ? `complete · ${msg.threads} init threads`
-            : `~${msg.etaSec}s remaining · ${msg.threads} init threads`;
+        renderTranslatedText($('datasetBarMeta'), msg.done >= msg.total
+          ? `complete · ${msg.threads} init threads`
+          : `~${msg.etaSec}s remaining · ${msg.threads} init threads`);
         if (msg.done >= msg.total) {
           state.datasetBuilt = true;
           if (state.mining) state.status = `mining with ${datasetThreads} thread${datasetThreads === 1 ? '' : 's'}`;
@@ -677,7 +707,7 @@ function toggle() {
     state.lastJob = null;
     // Reset the dataset bar to its idle "not started" look.
     $('datasetBar').textContent = renderBar(0);
-    $('datasetBarMeta').textContent = 'not started';
+    renderTranslatedText($('datasetBarMeta'), 'not started');
     state.mode = 'standby';
     if (state.worker) state.worker.postMessage({ type: 'stop' });
     if (state.ws) state.ws.close();
@@ -698,7 +728,7 @@ function toggle() {
       datasetThreads = desired;
       if (state.worker) {
         log(`Threads changed to ${datasetThreads}; terminating stale worker`);
-        try { state.worker.terminate(); } catch (_) {}
+        try { state.worker.terminate(); } catch (terminateError) { console.error('terminate failed', terminateError); }
         state.worker = null;
         state.workerReady = false;
       }
@@ -728,7 +758,7 @@ function hardRebuild(newThreads) {
   // →Hard-rebuild path would silently reuse the paused worker (which still
   // holds the old datasetThreads baked into its mineCtx).
   if (state.worker) {
-    try { state.worker.terminate(); } catch (_) {}
+    try { state.worker.terminate(); } catch (terminateError) { console.error('terminate failed', terminateError); }
     state.worker = null;
     state.workerReady = false;
   }
@@ -754,7 +784,7 @@ function hardRebuild(newThreads) {
   // Reset the dataset bar so the rebuild is visible immediately.
   $('datasetBarRow').hidden = false;
   $('datasetBar').textContent = renderBar(0);
-  $('datasetBarMeta').textContent = 'starting…';
+  renderTranslatedText($('datasetBarMeta'), 'starting…');
   updateUI();
   // Worker already terminated above; initWorker() spawns a fresh one and the
   // 'ready' handler replays state.lastJob.
@@ -814,7 +844,7 @@ function readStored(key, fallback) {
   try {
     const v = localStorage.getItem(key);
     return (v == null || v === '') ? fallback : v;
-  } catch (_) { return fallback; }
+  } catch { return fallback; }
 }
 
 const walletInput   = $('walletInput');
@@ -856,7 +886,7 @@ function persistConnection() {
     if (poolHostInput) localStorage.setItem(LS_POOL_HOST, poolHostInput.value.trim());
     if (poolPortInput) localStorage.setItem(LS_POOL_PORT, poolPortInput.value.trim());
     if (workerInput)   localStorage.setItem(LS_WORKER,    workerInput.value.trim());
-  } catch (_) {}
+  } catch (persistError) { console.error('persist failed', persistError); }
 }
 
 if (walletInput) {
@@ -916,7 +946,7 @@ if (setupToggle && walletSection) {
   setupToggle.addEventListener('click', () => {
     collapsed = !collapsed;
     apply();
-    try { localStorage.setItem(LS_SETUP_COLLAPSED, collapsed ? '1' : '0'); } catch (_) {}
+    try { localStorage.setItem(LS_SETUP_COLLAPSED, collapsed ? '1' : '0'); } catch {}
   });
 }
 
@@ -946,7 +976,7 @@ if (setAddressBtn) {
     }
     log(`Testing handshake → ${target.host}:${target.port}, wallet ${target.wallet.slice(0, 12)}…`);
     setAddressBtn.disabled = true;
-    setAddressBtn.textContent = 'Testing…';
+    renderTranslatedText(setAddressBtn, 'Testing…');
 
     const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
     const probe = new WebSocket(`${proto}//${location.host}`);
@@ -955,9 +985,9 @@ if (setAddressBtn) {
       if (done) return;
       done = true;
       log(text);
-      try { probe.close(); } catch (_) {}
+      try { probe.close(); } catch {}
       setAddressBtn.disabled = false;
-      setAddressBtn.textContent = 'Set';
+      renderTranslatedText(setAddressBtn, 'Set');
     };
 
     probe.onopen = () => {
@@ -966,7 +996,7 @@ if (setAddressBtn) {
     };
     probe.onmessage = (e) => {
       let msg;
-      try { msg = JSON.parse(e.data); } catch (_) { return; }
+      try { msg = JSON.parse(e.data); } catch { return; }
       if (msg.error) {
         const err = typeof msg.error === 'string' ? msg.error : JSON.stringify(msg.error);
         finish(`Handshake FAILED: ${err}`);
@@ -981,6 +1011,10 @@ if (setAddressBtn) {
 
 updateUI();
 tickBars();
+window.addEventListener('randomx:languagechange', () => {
+  updateUI();
+  tickBars();
+});
 setInterval(tickBars, 1000);
 
 // ───── Lorem ipsum scrollable background ────────────────────────────────────

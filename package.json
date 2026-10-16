@@ -7,10 +7,10 @@
   "jsdelivr": "dist/embed.js",
   "unpkg": "dist/embed.js",
   "files": ["dist", "README.md", "LICENSE"],
-  "repository": { "type": "git", "url": "git+https://github.com/aa022/RandomX-bonanza.git" },
+  "repository": { "type": "git", "url": "git+https://github.com/LMiguelGJ/monero-randomx-web.git" },
   "scripts": {
     "build": "make embed",
-    "test": "node --test tests/embed.test.cjs",
+    "test": "node --test tests/embed.test.cjs tests/ui-preferences.test.cjs tests/ui-i18n.test.cjs tests/ui-session.test.cjs",
     "prepack": "make embed"
   },
   "engines": { "node": ">=18" }

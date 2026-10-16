@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>randomx bonanza</title>
+<script src="ui-preferences.js"></script>
 
 <meta name="theme-color" content="#ffcfde" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#1a1815" media="(prefers-color-scheme: dark)">
@@ -521,24 +522,37 @@
   .site-consent { border-color: var(--w-amber); }
   @media(max-width: 560px) { .embed-grid { grid-template-columns: 1fr; } }
 </style>
+<link rel="stylesheet" href="ui-theme.css">
 </head>
 <body>
+  <nav class="page-preferences" aria-label="Interface preferences" data-i18n-aria-label="Interface preferences">
+    <label for="uiLanguage"><span data-i18n="Language">Idioma</span>
+      <select id="uiLanguage"><option value="es" lang="es">Español</option><option value="en" lang="en">English</option></select>
+    </label>
+    <label for="uiTheme"><span data-i18n="Appearance">Apariencia</span>
+      <select id="uiTheme">
+        <option value="light" data-i18n="Light">Claro</option>
+        <option value="dark" data-i18n="Dark">Oscuro</option>
+        <option value="system" data-i18n="System" selected>Sistema</option>
+      </select>
+    </label>
+  </nav>
   <div class="widget" id="widget">
     <div class="widget-header" id="widgetHeader">
       <span class="widget-title">randomx bonanza</span>
-      <button class="widget-toggle" id="widgetToggle" title="collapse / expand">[ − ]</button>
+      <button class="widget-toggle" id="widgetToggle" title="collapse / expand" data-i18n-title="collapse / expand">[ − ]</button>
     </div>
     <div class="widget-mini" id="widgetMini">
       <span class="mini-line">
-        <span class="mini-label">Next share ETA</span><span id="miniEta">--</span>
+        <span class="mini-label"><span data-i18n="Next share ETA">Next share ETA</span></span><span id="miniEta">--</span>
         <span class="mini-sep">·</span>
         <span class="mini-label">A/R</span><span id="miniShares">0/0</span>
         <span class="mini-sep">·</span>
         <span id="miniHashrate">   0</span><span class="mini-label" style="margin-left:0.25rem">H/s</span>
       </span>
       <span class="mini-controls">
-        <button id="miniToggle">Start</button>
-        <button id="miniRebuild">Rebuild</button>
+        <button id="miniToggle"><span data-i18n="Start">Start</span></button>
+        <button id="miniRebuild"><span data-i18n="Rebuild">Rebuild</span></button>
         <input type="number" id="miniThreads" min="1" max="32" value="32">
       </span>
     </div>
@@ -546,87 +560,87 @@
     <div class="widget-body">
       <div class="bars">
         <div class="bar-row stat-row" id="shares-row">
-          <div class="bar-label">Shares</div>
+          <div class="bar-label"><span data-i18n="Shares">Shares</span></div>
           <div class="bar-line"><span id="accepted">0</span> / <span id="rejected">0</span></div>
-          <div class="bar-meta">accepted / rejected</div>
+          <div class="bar-meta"><span data-i18n="accepted / rejected">accepted / rejected</span></div>
         </div>
 
         <div class="bar-row stat-row" id="mode-row">
-          <div class="bar-label">Mode</div>
-          <div class="bar-line" id="mode">standby</div>
+          <div class="bar-label"><span data-i18n="Mode">Mode</span></div>
+          <div class="bar-line" id="mode"><span data-i18n="standby">standby</span></div>
         </div>
 
         <div class="bar-row stat-row" id="status-row">
-          <div class="bar-label">Status</div>
-          <div class="bar-line" id="status">disconnected</div>
+          <div class="bar-label"><span data-i18n="Status">Status</span></div>
+          <div class="bar-line" id="status"><span data-i18n="disconnected">disconnected</span></div>
         </div>
 
         <div class="section-rule"></div>
 
         <div class="bar-row" id="hashrate-row">
-          <div class="bar-label">Hashrate</div>
-          <div class="bar-line" id="hashrateBar">&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;    - H/s</div>
-          <div class="bar-meta" id="hashrateMeta">no samples yet</div>
+          <div class="bar-label"><span data-i18n="Hashrate">Hashrate</span></div>
+          <div class="bar-line" id="hashrateBar">&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;    <span data-i18n="- H/s">- H/s</span></div>
+          <div class="bar-meta" id="hashrateMeta"><span data-i18n="no samples yet">no samples yet</span></div>
         </div>
 
         <div class="bar-row" id="datasetBarRow">
-          <div class="bar-label">Dataset build</div>
+          <div class="bar-label"><span data-i18n="Dataset build">Dataset build</span></div>
           <div class="bar-line" id="datasetBar">&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;   - %</div>
-          <div class="bar-meta" id="datasetBarMeta">not started</div>
+          <div class="bar-meta" id="datasetBarMeta"><span data-i18n="not started">not started</span></div>
         </div>
 
         <div class="bar-row" id="shareBarRow">
-          <div class="bar-label">Next share ETA</div>
-          <div class="bar-line" id="shareBar">&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;    - s</div>
-          <div class="bar-meta" id="shareBarMeta">not mining</div>
+          <div class="bar-label"><span data-i18n="Next share ETA">Next share ETA</span></div>
+          <div class="bar-line" id="shareBar">&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;&#9649;    <span data-i18n="- s">- s</span></div>
+          <div class="bar-meta" id="shareBarMeta"><span data-i18n="not mining">not mining</span></div>
         </div>
 
         <div class="section-rule"></div>
 
         <div class="wallet-section" id="walletSection">
           <div class="setup-header-row">
-            <span>Wallet setup</span>
-            <button type="button" class="setup-toggle" id="setupToggle" title="show / hide wallet setup">[+]</button>
+            <span><span data-i18n="Wallet setup">Wallet setup</span></span>
+            <button type="button" class="setup-toggle" id="setupToggle" title="show / hide wallet setup" data-i18n-title="show / hide wallet setup">[+]</button>
           </div>
           <div class="wallet-body" id="walletBody">
             <div class="bar-row input-row">
-              <div class="bar-label">Wallet</div>
+              <div class="bar-label"><span data-i18n="Wallet">Wallet</span></div>
               <div class="bar-line">
-                <input type="text" id="walletInput" spellcheck="false" autocomplete="off" placeholder="monero address">
-                <button id="setAddressBtn" type="button">Set</button>
+                <input type="text" id="walletInput" spellcheck="false" autocomplete="off" placeholder="monero address" data-i18n-placeholder="monero address">
+                <button id="setAddressBtn" type="button"><span data-i18n="Set">Set</span></button>
               </div>
-              <div class="bar-meta">payout destination · Set tests pool handshake</div>
+              <div class="bar-meta"><span data-i18n="payout destination · Set tests pool handshake">payout destination · Set tests pool handshake</span></div>
             </div>
 
             <div id="setupBody">
           <div class="bar-row input-row">
-            <div class="bar-label">Worker</div>
+            <div class="bar-label"><span data-i18n="Worker">Worker</span></div>
             <div class="bar-line">
-              <input type="text" id="workerInput" spellcheck="false" autocomplete="off" placeholder="worker name">
+              <input type="text" id="workerInput" spellcheck="false" autocomplete="off" placeholder="worker name" data-i18n-placeholder="worker name">
             </div>
-            <div class="bar-meta">identifier for this miner (Stratum pass field)</div>
+            <div class="bar-meta"><span data-i18n="identifier for this miner (Stratum pass field)">identifier for this miner (Stratum pass field)</span></div>
           </div>
 
           <div class="bar-row input-row">
-            <div class="bar-label">Preset</div>
+            <div class="bar-label"><span data-i18n="Preset">Preset</span></div>
             <div class="bar-line">
-              <button id="presetSupportxmr" type="button">supportxmr</button>
-              <button id="presetMoneroocean" type="button">moneroocean</button>
+              <button id="presetSupportxmr" type="button"><span data-i18n="supportxmr">supportxmr</span></button>
+              <button id="presetMoneroocean" type="button"><span data-i18n="moneroocean">moneroocean</span></button>
             </div>
-            <div class="bar-meta">fills host + port (wallet unchanged)</div>
+            <div class="bar-meta"><span data-i18n="fills host + port (wallet unchanged)">fills host + port (wallet unchanged)</span></div>
           </div>
 
           <div class="bar-row input-row">
-            <div class="bar-label">Pool</div>
+            <div class="bar-label"><span data-i18n="Pool">Pool</span></div>
             <div class="bar-line">
-              <input type="text" id="poolHostInput" spellcheck="false" autocomplete="off" placeholder="HOST">
-              <input type="number" id="poolPortInput" class="pool-port" min="1" max="65535" placeholder="PORT">
+              <input type="text" id="poolHostInput" spellcheck="false" autocomplete="off" placeholder="HOST" data-i18n-placeholder="HOST">
+              <input type="number" id="poolPortInput" class="pool-port" min="1" max="65535" placeholder="PORT" data-i18n-placeholder="PORT">
               <span class="donate-wrap">
-                <button id="donateBtn" type="button">Donate</button>
-                <span class="donate-hint">set donate address macro</span>
+                <button id="donateBtn" type="button"><span data-i18n="Donate">Donate</span></button>
+                <span class="donate-hint"><span data-i18n="set donate address macro">set donate address macro</span></span>
               </span>
             </div>
-            <div class="bar-meta">apply on next Start (or Rebuild)</div>
+            <div class="bar-meta"><span data-i18n="apply on next Start (or Rebuild)">apply on next Start (or Rebuild)</span></div>
           </div>
           </div>
           </div>
@@ -635,16 +649,16 @@
         <div class="section-rule"></div>
 
         <div class="bar-row rebuild-row">
-          <div class="bar-label">Thread count</div>
+          <div class="bar-label"><span data-i18n="Thread count">Thread count</span></div>
           <div class="bar-line">
-            <button id="toggle">Start</button>
-            <button id="rebuildBtn">Rebuild</button>
+            <button id="toggle"><span data-i18n="Start">Start</span></button>
+            <button id="rebuildBtn"><span data-i18n="Rebuild">Rebuild</span></button>
             <span class="threads-control">
-              <span class="threads-label">Threads</span>
+              <span class="threads-label"><span data-i18n="Threads">Threads</span></span>
               <input type="number" id="rebuildThreads" min="1" max="32" value="32">
             </span>
           </div>
-          <div class="bar-meta">rebuild to adjust thread count</div>
+          <div class="bar-meta"><span data-i18n="rebuild to adjust thread count">rebuild to adjust thread count</span></div>
         </div>
 
         <div class="section-rule"></div>
@@ -654,70 +668,83 @@
     </div>
   </div>
 
-  <section class="embed-builder" aria-label="Embed script builder">
-    <h2>Embed configuration</h2>
+  <section class="mining-preferences" aria-label="Automatic mining preferences" data-i18n-aria-label="Automatic mining preferences">
+    <label for="uiAutostart"><input id="uiAutostart" type="checkbox" aria-describedby="uiAutostartHelp uiAutostartStatus">
+      <span data-i18n="I authorize automatic mining on this device when I open this page.">I authorize automatic mining on this device when I open this page.</span>
+    </label>
+    <p id="uiAutostartHelp" data-i18n="Mining uses CPU and electricity. This permission is saved only in this browser for this site, including production. Uncheck to disable future automatic starts; use Stop to end the current session.">Mining uses CPU and electricity. This permission is saved only in this browser for this site, including production. Uncheck to disable future automatic starts; use Stop to end the current session.</p>
+    <p id="uiAutostartStatus" role="status" aria-live="polite"></p>
+  </section>
+
+  <section class="embed-builder" aria-label="Embed script builder" data-i18n-aria-label="Embed script builder">
+    <div class="embed-builder-header">
+      <h2><span data-i18n="Embed configuration">Embed configuration</span></h2>
+      <button id="embedBuilderToggle" type="button" aria-expanded="false" aria-controls="embedBuilderContent" data-i18n="Expand">Expand</button>
+    </div>
+    <div id="embedBuilderContent" hidden>
     <form id="embedBuilder">
       <div class="embed-grid">
-        <label class="wide">Monero wallet<input name="wallet" required maxlength="256" autocomplete="off" spellcheck="false"></label>
-        <label>Pool<input name="pool" required autocomplete="off" spellcheck="false"></label>
-        <label>TCP port<input name="port" type="number" min="1" max="65535" required value="3333"></label>
-        <label class="wide">WebSocket proxy<input name="proxy" required placeholder="wss://your-bridge.example" spellcheck="false"></label>
+        <label class="wide"><span data-i18n="Monero wallet">Monero wallet</span><input name="wallet" required maxlength="256" autocomplete="off" spellcheck="false"></label>
+        <label><span data-i18n="Pool">Pool</span><input name="pool" required autocomplete="off" spellcheck="false"></label>
+        <label><span data-i18n="TCP port">TCP port</span><input name="port" type="number" min="1" max="65535" required value="3333"></label>
+        <label class="wide"><span data-i18n="WebSocket proxy">WebSocket proxy</span><input name="proxy" required placeholder="wss://your-bridge.example" spellcheck="false"></label>
         <label>CPU %<input name="workload" type="number" min="0" max="80" step="any" value="50" required></label>
-        <label>Interface<select name="display"><option value="widget">Widget</option><option value="headless">Headless API</option></select></label>
-        <label class="wide">Quickstart<span><input name="quickstart" type="checkbox"> Request consent on first interaction</span></label>
+        <label><span data-i18n="Interface">Interface</span><select name="display"><option value="widget" data-i18n="Widget">Widget</option><option value="headless" data-i18n="Headless API">Headless API</option></select></label>
+        <label class="wide"><span data-i18n="Quickstart">Quickstart</span><span><input name="quickstart" type="checkbox"> <span data-i18n="Request consent on first interaction">Request consent on first interaction</span></span></label>
       </div>
       <details>
-        <summary>Advanced</summary>
+        <summary><span data-i18n="Advanced">Advanced</span></summary>
         <div class="embed-grid">
-          <label>Worker<input name="workerName" value="embed" maxlength="64"></label>
-          <label>Memory<select name="mode"><option value="full">Full · 2.5 GiB</option><option value="light">Light · ~300 MB per worker</option></select></label>
-          <label class="wide">Proxy routing<select name="routeQuery"><option value="true">Add pool / port query</option><option value="false">Fixed endpoint</option></select></label>
-          <label>Nonce mode<select name="nonceMode"><option value="auto">Negotiated</option><option value="nicehash">NiceHash</option></select></label>
-          <label>Keepalive<select name="keepalive"><option value="auto">Negotiated</option><option value="required">Required · every 15 s</option></select></label>
-          <label class="wide">Script URL<input name="scriptURL" required spellcheck="false" value="https://cdn.jsdelivr.net/gh/aa022/RandomX-bonanza@v0.3.0/dist/embed.js"></label>
+          <label><span data-i18n="Worker">Worker</span><input name="workerName" value="embed" maxlength="64"></label>
+          <label><span data-i18n="Memory">Memory</span><select name="mode"><option value="full" data-i18n="Full · 2.5 GiB">Full · 2.5 GiB</option><option value="light" data-i18n="Light · ~300 MB per worker">Light · ~300 MB per worker</option></select></label>
+          <label class="wide"><span data-i18n="Proxy routing">Proxy routing</span><select name="routeQuery"><option value="true" data-i18n="Add pool / port query">Add pool / port query</option><option value="false" data-i18n="Fixed endpoint">Fixed endpoint</option></select></label>
+          <label><span data-i18n="Nonce mode">Nonce mode</span><select name="nonceMode"><option value="auto" data-i18n="Negotiated">Negotiated</option><option value="nicehash" data-i18n="NiceHash">NiceHash</option></select></label>
+          <label><span data-i18n="Keepalive">Keepalive</span><select name="keepalive"><option value="auto" data-i18n="Negotiated">Negotiated</option><option value="required" data-i18n="Required · every 15 s">Required · every 15 s</option></select></label>
+          <label class="wide"><span data-i18n="Script URL">Script URL</span><input name="scriptURL" required spellcheck="false" value="https://cdn.jsdelivr.net/gh/aa022/RandomX-bonanza@v0.3.0/dist/embed.js"></label>
         </div>
       </details>
       <p id="embedBudget"></p>
-      <button type="submit">Generate</button>
-      <button id="embedCopy" type="button">Copy</button>
-      <button id="embedShowPreview" type="button">Preview</button>
-      <button id="embedClearPreview" type="button">Clear</button>
+      <button type="submit"><span data-i18n="Generate">Generate</span></button>
+      <button id="embedCopy" type="button"><span data-i18n="Copy">Copy</span></button>
+      <button id="embedShowPreview" type="button"><span data-i18n="Preview">Preview</span></button>
+      <button id="embedClearPreview" type="button"><span data-i18n="Clear">Clear</span></button>
     </form>
-    <label for="embedSnippet">Script</label>
-    <textarea id="embedSnippet" readonly spellcheck="false" aria-label="Generated embed script"></textarea>
+    <label for="embedSnippet"><span data-i18n="Script">Script</span></label>
+    <textarea id="embedSnippet" readonly spellcheck="false" aria-label="Generated embed script" data-i18n-aria-label="Generated embed script"></textarea>
     <p id="embedBuilderStatus" role="status" aria-live="polite"></p>
     <details class="embed-deployment">
-      <summary>Deployment / CORS</summary>
+      <summary><span data-i18n="Deployment / CORS">Deployment / CORS</span></summary>
       <table>
-        <thead><tr><th>Endpoint</th><th>Configuration</th></tr></thead>
+        <thead><tr><th><span data-i18n="Endpoint">Endpoint</span></th><th><span data-i18n="Configuration">Configuration</span></th></tr></thead>
         <tbody>
-          <tr><td>Host page</td><td>HTTPS. Set COOP and COEP on the HTML response. These headers enable the shared memory used by WASM threads.</td></tr>
-          <tr><td>Static assets</td><td>Publish the complete <code>dist/</code> directory to the script URL’s pinned release. For your own asset server, send the CORS and CORP headers below on JavaScript and WASM responses, including redirects.</td></tr>
-          <tr><td>Pool proxy</td><td>Use <code>wss://</code> on HTTPS pages. Forward WebSocket upgrades to the bridge. This bridge uses a <code>pool</code>/<code>port</code> URL query; choose Fixed endpoint for proxies that select their pool internally. Match the disclosed pool to that endpoint. Message frames carry XMRig-shaped <code>login</code>, <code>job</code> and <code>submit</code> JSON-RPC. Native WebSocket ping/pong checks the transport.</td></tr>
+          <tr><td><span data-i18n="Host page">Host page</span></td><td><span data-i18n="HTTPS. Set COOP and COEP on the HTML response. These headers enable the shared memory used by WASM threads.">HTTPS. Set COOP and COEP on the HTML response. These headers enable the shared memory used by WASM threads.</span></td></tr>
+          <tr><td><span data-i18n="Static assets">Static assets</span></td><td><span data-i18n="Publish the complete">Publish the complete</span> <code>dist/</code> <span data-i18n="directory to the script URL’s pinned release. For your own asset server, send the CORS and CORP headers below on JavaScript and WASM responses, including redirects.">directory to the script URL’s pinned release. For your own asset server, send the CORS and CORP headers below on JavaScript and WASM responses, including redirects.</span></td></tr>
+          <tr><td><span data-i18n="Pool proxy">Pool proxy</span></td><td><span data-i18n="Use">Use</span> <code>wss://</code> <span data-i18n="on HTTPS pages. Forward WebSocket upgrades to the bridge. This bridge uses a">on HTTPS pages. Forward WebSocket upgrades to the bridge. This bridge uses a</span> <code>pool</code>/<code>port</code> <span data-i18n="URL query; choose Fixed endpoint for proxies that select their pool internally. Match the disclosed pool to that endpoint. Message frames carry XMRig-shaped">URL query; choose Fixed endpoint for proxies that select their pool internally. Match the disclosed pool to that endpoint. Message frames carry XMRig-shaped</span> <code>login</code>, <code>job</code> <span data-i18n="and">and</span> <code>submit</code> <span data-i18n="JSON-RPC. Native WebSocket ping/pong checks the transport.">JSON-RPC. Native WebSocket ping/pong checks the transport.</span></td></tr>
         </tbody>
       </table>
-      <p>HTML response headers</p>
+      <p><span data-i18n="HTML response headers">HTML response headers</span></p>
       <pre>Cross-Origin-Opener-Policy: same-origin
 Cross-Origin-Embedder-Policy: require-corp</pre>
-      <p>Cross-origin static asset response headers</p>
+      <p><span data-i18n="Cross-origin static asset response headers">Cross-origin static asset response headers</span></p>
       <pre>Access-Control-Allow-Origin: *
 Cross-Origin-Resource-Policy: cross-origin
 Content-Type: application/javascript  # .js
 Content-Type: application/wasm        # .wasm</pre>
-      <p>Generated scripts use <code>crossorigin="anonymous"</code>; asset requests omit cross-origin credentials. CORS belongs on the asset server. Adding it to the host page alone does not grant access to another server’s files.</p>
-      <p>For an existing Content Security Policy, allow the asset origin in <code>script-src</code> and <code>connect-src</code>, the proxy in <code>connect-src</code>, and <code>blob:</code> workers. Example for jsDelivr:</p>
+      <p><span data-i18n="Generated scripts use">Generated scripts use</span> <code>crossorigin="anonymous"</code><span data-i18n="; asset requests omit cross-origin credentials. CORS belongs on the asset server. Adding it to the host page alone does not grant access to another server’s files.">; asset requests omit cross-origin credentials. CORS belongs on the asset server. Adding it to the host page alone does not grant access to another server’s files.</span></p>
+      <p><span data-i18n="For an existing Content Security Policy, allow the asset origin in">For an existing Content Security Policy, allow the asset origin in</span> <code>script-src</code> <span data-i18n="and">and</span> <code>connect-src</code><span data-i18n=", the proxy in">, the proxy in</span> <code>connect-src</code><span data-i18n=", and">, and</span> <code>blob:</code> <span data-i18n="workers. Example for jsDelivr:">workers. Example for jsDelivr:</span></p>
       <pre>script-src 'self' https://cdn.jsdelivr.net blob: 'wasm-unsafe-eval';
 worker-src 'self' blob:;
 connect-src 'self' https://cdn.jsdelivr.net wss://YOUR_PROXY;</pre>
-      <p>Authorize inline initialization with your site’s script nonce or hash. For the widget stylesheet, pass a matching <code>nonce</code> and allow it in <code>style-src</code>. Keep your existing CSP directives. Browsers needing the broader WASM permission may require <code>'unsafe-eval'</code>.</p>
-      <p>COEP also applies to other resources on the page: external scripts, fonts and images must support CORS or an appropriate CORP policy. WebSockets use an <code>Origin</code> header rather than CORS preflight; allow the embedding site in your proxy’s origin policy.</p>
-      <p>Verify in the embedding page’s console:</p>
+      <p><span data-i18n="Authorize inline initialization with your site’s script nonce or hash. For the widget stylesheet, pass a matching">Authorize inline initialization with your site’s script nonce or hash. For the widget stylesheet, pass a matching</span> <code>nonce</code> <span data-i18n="and allow it in">and allow it in</span> <code>style-src</code><span data-i18n=". Keep your existing CSP directives. Browsers needing the broader WASM permission may require">. Keep your existing CSP directives. Browsers needing the broader WASM permission may require</span> <code>'unsafe-eval'</code>.</p>
+      <p><span data-i18n="COEP also applies to other resources on the page: external scripts, fonts and images must support CORS or an appropriate CORP policy. WebSockets use an">COEP also applies to other resources on the page: external scripts, fonts and images must support CORS or an appropriate CORP policy. WebSockets use an</span> <code>Origin</code> <span data-i18n="header rather than CORS preflight; allow the embedding site in your proxy’s origin policy.">header rather than CORS preflight; allow the embedding site in your proxy’s origin policy.</span></p>
+      <p><span data-i18n="Verify in the embedding page’s console:">Verify in the embedding page’s console:</span></p>
       <pre>window.isSecureContext === true
 window.crossOriginIsolated === true
 typeof SharedArrayBuffer === 'function'</pre>
-      <p>If isolation is false, check the HTML response headers and any <code>Permissions-Policy</code> restriction on <code>cross-origin-isolated</code>. If assets fail, inspect their CORS/CORP headers and CSP errors. If the proxy fails, check TLS, its Origin policy, and the HTTP <code>101</code> upgrade response. Safari’s local demo needs HTTPS; a CDN script cannot supply isolation headers for its host page.</p>
+      <p><span data-i18n="If isolation is false, check the HTML response headers and any">If isolation is false, check the HTML response headers and any</span> <code>Permissions-Policy</code> <span data-i18n="restriction on">restriction on</span> <code>cross-origin-isolated</code><span data-i18n=". If assets fail, inspect their CORS/CORP headers and CSP errors. If the proxy fails, check TLS, its Origin policy, and the HTTP">. If assets fail, inspect their CORS/CORP headers and CSP errors. If the proxy fails, check TLS, its Origin policy, and the HTTP</span> <code>101</code> <span data-i18n="upgrade response. Safari’s local demo needs HTTPS; a CDN script cannot supply isolation headers for its host page.">upgrade response. Safari’s local demo needs HTTPS; a CDN script cannot supply isolation headers for its host page.</span></p>
     </details>
     <div id="embedPreview"></div>
+    </div>
   </section>
 
   <!-- MINER_DEFAULTS is rewritten from config.js by the local proxy so the
@@ -792,8 +819,10 @@ typeof SharedArrayBuffer === 'function'</pre>
     })();
   </script>
   <script src="fb_full.js"></script>
+  <script src="ui-i18n.js"></script>
   <script src="miner.js"></script>
   <script src="embed.js" data-auto="false"></script>
   <script src="embed-builder.js"></script>
+  <script src="ui-session.js"></script>
 </body>
 </html>

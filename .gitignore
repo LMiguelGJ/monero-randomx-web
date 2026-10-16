@@ -28,6 +28,17 @@ config.local.js
 .env
 .env.*
 
+# Wallet credentials — never commit seed phrases or private keys.
+monero.txt
+*.mnemonic
+*.seed
+wallet*.txt
+
+# Local tooling and ephemeral session data
+.codegraph/
+.playwright-mcp/
+.atl/
+
 # OS metadata
 .DS_Store
 Thumbs.db

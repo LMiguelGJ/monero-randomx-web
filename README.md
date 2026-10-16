@@ -45,6 +45,16 @@ make fclean      # clean + drop .make/ stamps
 make re          # fclean + build
 ```
 
+## Local interface preferences
+
+The local demo starts in **Spanish**. Use the **Idioma / Language** selector above the miner to switch between Spanish and English. The **Apariencia / Appearance** selector offers **Claro / Light**, **Oscuro / Dark**, and **Sistema / System** (the default, following your operating system).
+
+Changes apply without reloading the page or restarting mining. Language and appearance are saved in this browser for future visits. If browser storage is unavailable, the controls still work for the current page. These preferences belong to the local demo; they do not change the pool, wallet, worker, or the deployed embed API.
+
+Mining starts automatically when the page opens. Uncheck the **Automatic mining / Minería automática** control to stop the active session and disable future auto-starts in this browser and domain; check it again to resume. The setting is stored per browser and per domain, so it works the same on `localhost` and on production.
+
+Run `npm test` for the embed lifecycle, page preference, and localization regression tests.
+
 ## Browser support
 
 Firefox is mostly untested.
