@@ -16,10 +16,9 @@ name: monero-randomx-web
 
 services:
   randomx:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: monero-randomx-web:latest
+    # Image built and pushed by .github/workflows/docker.yml on every push to
+    # main. Override the tag here to pin a specific commit if you need to.
+    image: ghcr.io/lmiguelgj/monero-randomx-web:latest
     container_name: monero-randomx-web
     restart: unless-stopped
     ports:
@@ -36,7 +35,13 @@ services:
       - WS_PORT=8080
       - STRATUM_TCP_PORT=3333
     healthcheck:
-      test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:'+process.env.WS_PORT+'/',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"]
+      test:
+        - CMD
+        - node
+        - -e
+        - >-
+          require('http').get('http://127.0.0.1:'+process.env.WS_PORT+'/',
+          r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))
       interval: 30s
       timeout: 5s
       retries: 3
