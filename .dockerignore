@@ -1,0 +1,41 @@
+# ─── Git and version control ────────────────────────────────────────────────
+.git/
+.gitignore
+
+# ─── Local tooling and ephemeral session data ──────────────────────────────
+.codegraph/
+.playwright-mcp/
+.atl/
+node_modules/
+
+# ─── Credentials — never include in container context ──────────────────────
+monero.txt
+*.mnemonic
+*.seed
+wallet*.txt
+
+# ─── Build artifacts that the builder stage will produce ───────────────────
+public/randomx.js
+public/randomx.wasm
+public/randomx_st.js
+public/randomx_st.wasm
+public/randomx.worker.js
+.make/
+
+# ─── Development artifacts (not needed in runtime) ─────────────────────────
+*.log
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+*.bak
+
+# ─── Project subdirs not needed in the runtime image ──────────────────────
+dist/                # jsDelivr/npm distribution (built artifacts)
+tests/               # test suite (run on host, not in container)
+bench/               # bench scripts (run on host, not in container)
+docs/                # documentation (read on host, not served)
+readme/              # README images
+scripts/             # build/embed packaging scripts

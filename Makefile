@@ -33,7 +33,7 @@ DURATION     ?= 30
 PROFILE      ?= auto
 EXTRA        ?=
 
-.PHONY: all help install build embed serve bench bench-light test test-embed clean fclean re
+.PHONY: all help install build embed serve bench bench-light test test-embed clean fclean re docker-build docker-up docker-down docker-logs docker-push
 
 # Target dep graph:
 #   install ──→ deps stamp ──→ public/randomx{,_st}.{js,wasm} ──→ build
@@ -63,6 +63,10 @@ help:
 	@printf '  clean        remove build outputs\n'
 	@printf '  fclean       clean + drop .make/ stamps\n'
 	@printf '  re           fclean + build\n'
+	@printf '  docker-build build the multi-stage container image\n'
+	@printf '  docker-up    build + start via docker compose (detached)\n'
+	@printf '  docker-down  stop and remove the compose stack\n'
+	@printf '  docker-logs  tail compose logs\n'
 	@printf '\n'
 	@printf 'Bench knobs:  SWEEP=$(SWEEP)  INIT_THREADS=$(INIT_THREADS)  DURATION=$(DURATION)  PROFILE=$(PROFILE)\n'
 	@printf '              PROFILE: JIT generator profile, auto (x86 on x86-64 hosts, else arm) | arm | x86\n'
@@ -177,3 +181,25 @@ fclean: clean
 	@printf '[fclean] stamps removed\n'
 
 re: fclean build
+
+# ─── docker ─────────────────────────────────────────────────────────────────
+# Multi-stage build: emscripten/emsdk compila el motor WASM, node:20-alpine
+# corre el proxy. .dockerignore excluye credenciales y tooling local. El primer
+# build tarda varios minutos por la toolchain de Emscripten; los siguientes
+# reutilizan las capas cacheadas.
+DOCKER_IMAGE ?= monero-randomx-web:latest
+
+docker-build:
+	@docker build -t $(DOCKER_IMAGE) .
+
+docker-up:
+	@docker compose up -d --build
+
+docker-down:
+	@docker compose down
+
+docker-logs:
+	@docker compose logs -f
+
+docker-push: docker-build
+	@docker push $(DOCKER_IMAGE)

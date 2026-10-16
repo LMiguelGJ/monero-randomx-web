@@ -55,6 +55,72 @@ Mining starts automatically when the page opens. Uncheck the **Automatic mining 
 
 Run `npm test` for the embed lifecycle, page preference, and localization regression tests.
 
+## Docker
+
+A multi-stage `Dockerfile` builds the WASM engine with the Emscripten toolchain and ships a slim `node:20-alpine` runtime. `docker-compose.yml` wraps it with persistent logs, a read-only mount for your wallet/pool config, and a healthcheck.
+
+### Quick start
+
+```sh
+docker compose up -d --build       # first build: ~5–8 min (WASM toolchain)
+docker compose logs -f randomx     # follow the proxy
+# open http://localhost:8080
+
+docker compose down                 # stop and remove the stack
+```
+
+Subsequent builds reuse the cached Emscripten layer and finish in seconds.
+
+### What the image exposes
+
+| Port | Purpose                                                  |
+|-----:|----------------------------------------------------------|
+| 8080 | HTTP + WebSocket proxy (the demo and the miner)          |
+| 3333 | Raw TCP stratum bridge (optional; for xmrig and friends) |
+
+The image runs as the unprivileged `node` user (uid 1000) and the embedded healthcheck polls `http://127.0.0.1:8080/` every 30 s.
+
+### Customising without rebuilding
+
+`docker-compose.yml` mounts `./config.js` as a read-only volume. Edit that file locally and restart the stack to point at a different wallet or pool — no image rebuild required. The `randomx-logs` named volume persists logs across container restarts.
+
+### Environment variables
+
+| Variable           | Default      | Notes                                     |
+|--------------------|--------------|-------------------------------------------|
+| `NODE_ENV`         | `production` | leave as-is for the container runtime     |
+| `WS_PORT`          | `8080`       | HTTP + WebSocket port inside the container |
+| `STRATUM_TCP_PORT` | `3333`       | TCP stratum bridge inside the container   |
+
+`docker-compose.yml` already binds these to the host. Change the host-side mapping (the left-hand port) in `docker-compose.yml` if you need to remap.
+
+### Deploying to dokploy / Portainer / a remote host
+
+Point your orchestrator at the repository root; `Dockerfile` and `docker-compose.yml` are the contract. Dokploy reads the compose file directly. The repository's origin is `https://github.com/LMiguelGJ/monero-randomx-web`, so a typical setup is:
+
+1. Create a new application/service in dokploy and select **Docker Compose** as the build source.
+2. Set the repository to `https://github.com/LMiguelGJ/monero-randomx-web` and branch `main`.
+3. Leave `Dockerfile` and `docker-compose.yml` at their defaults.
+4. Map the public port(s) you want to expose; the proxy listens on `8080` inside the container.
+5. Put a reverse proxy (Caddy, nginx, Traefik) in front for HTTPS and the COOP/COEP headers the miner needs on a real hostname.
+
+### Make targets
+
+The `Makefile` mirrors the compose workflow:
+
+```sh
+make docker-build   # docker build -t monero-randomx-web:latest .
+make docker-up      # docker compose up -d --build
+make docker-down    # docker compose down
+make docker-logs    # docker compose logs -f
+make docker-push    # build + push (edit DOCKER_IMAGE= to retag)
+```
+
+### What is NOT in the image
+
+- `monero.txt` and any other wallet credentials are excluded by `.dockerignore`. If you keep a seed phrase locally, do not commit it and do not bind-mount it into the container.
+- `.codegraph/`, `.playwright-mcp/`, `.atl/`, local IDE state, and the `tests/`, `bench/`, `docs/`, `readme/`, `scripts/`, `dist/` directories are excluded as development-only.
+
 ## Browser support
 
 Firefox is mostly untested.

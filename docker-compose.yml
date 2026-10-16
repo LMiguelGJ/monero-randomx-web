@@ -1,0 +1,53 @@
+# Docker Compose para RandomX bonanza.
+# Build:  docker compose build
+# Run:    docker compose up -d
+# Logs:   docker compose logs -f
+# Stop:   docker compose down
+#
+# El config.js se monta como volumen de solo lectura para que puedas cambiar
+# tu wallet/pool sin rebuildear la imagen. Reemplaza ./config.js por la ruta
+# a tu archivo de configuración personalizado si lo tienes separado.
+#
+# En producción detrás de dokploy u otro orquestador, expone los puertos a
+# través de un proxy inverso (Caddy/nginx) para tener HTTPS y los headers
+# COOP/COEP que el minero necesita.
+
+name: monero-randomx-web
+
+services:
+  randomx:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: monero-randomx-web:latest
+    container_name: monero-randomx-web
+    restart: unless-stopped
+    ports:
+      - "8080:8080"   # HTTP + WebSocket proxy
+      - "3333:3333"   # TCP stratum bridge (opcional)
+    volumes:
+      # Wallet/pool personalizado sin rebuildear la imagen.
+      - ./config.js:/app/config.js:ro
+      # Logs persistentes. El proxy actual solo escribe a stdout; este
+      # volumen queda listo para cuando agregues logging a archivo.
+      - randomx-logs:/app/logs
+    environment:
+      - NODE_ENV=production
+      - WS_PORT=8080
+      - STRATUM_TCP_PORT=3333
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:'+process.env.WS_PORT+'/',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    # Dokploy / Portainer: si tu orquestador inyecta la red, comenta
+    # networks y deja que use la red por defecto del proyecto.
+
+volumes:
+  randomx-logs:
